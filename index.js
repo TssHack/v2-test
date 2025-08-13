@@ -5,8 +5,9 @@ import fetch from "node-fetch";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// نام پیش‌فرض همه سرویس‌ها
-const fancyName = "𝙀𝙃𝙎𝘼𝙉 🇩🇪";
+// لیست ایموجی‌های مجاز
+const flagEmojis = ["🇩🇪", "🇳🇱", "🇬🇧", "🇺🇸", "🇹🇷", "🇦🇪", "🇯🇵"];
+
 // نام ویژه برای یک سرویس
 const specialName = "Telegram; @abj0o";
 
@@ -16,23 +17,31 @@ async function getMergedProxies() {
     "https://nextjs.irdevs.sbs/"
   ];
 
-  // گرفتن داده‌ها از هر دو URL
+  // گرفتن داده‌ها از همه URLها
   const results = await Promise.all(urls.map(url => fetch(url).then(r => r.text())));
   let merged = results.join("\n").trim();
 
   // تقسیم به خطوط
   let lines = merged.split("\n").filter(l => l.trim() !== "");
 
-  // انتخاب یک سرویس رندوم
+  // انتخاب یک سرویس به صورت رندوم برای specialName
   const randomIndex = Math.floor(Math.random() * lines.length);
 
-  // تغییر نام سرویس‌ها
   lines = lines.map((line, index) => {
-    // حذف هر چیزی بعد از # و جایگزینی با نام جدید
+    // ایموجی رندوم انتخاب کن
+    const randomFlag = flagEmojis[Math.floor(Math.random() * flagEmojis.length)];
+    const fancyName = `𝙀𝙃𝙎𝘼𝙉 ${randomFlag}`;
+
+    // حذف هر چیزی بعد از #
+    if (line.includes("#")) {
+      line = line.replace(/#.*/, "");
+    }
+
+    // اضافه کردن اسم جدید
     if (index === randomIndex) {
-      return line.replace(/#.*/, `#${specialName}`);
+      return `${line}#${specialName}`;
     } else {
-      return line.replace(/#.*/, `#${fancyName}`);
+      return `${line}#${fancyName}`;
     }
   });
 
