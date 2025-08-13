@@ -1,10 +1,13 @@
+// index.js
 import express from "express";
 import fetch from "node-fetch";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const fancyName = "𝗘𝗵𝘀𝗮𝗻";
+// نام پیش‌فرض همه سرویس‌ها
+const fancyName = "𝙀𝙃𝙎𝘼𝙉 🇩🇪";
+// نام ویژه برای یک سرویس
 const specialName = "Telegram; @abj0o";
 
 async function getMergedProxies() {
@@ -13,24 +16,24 @@ async function getMergedProxies() {
     "https://nextjs.irdevs.sbs/"
   ];
 
-  // گرفتن داده‌ها
+  // گرفتن داده‌ها از هر دو URL
   const results = await Promise.all(urls.map(url => fetch(url).then(r => r.text())));
   let merged = results.join("\n").trim();
 
-  // جدا کردن لینک‌ها در آرایه
+  // تقسیم به خطوط
   let lines = merged.split("\n").filter(l => l.trim() !== "");
 
-  // انتخاب رندوم یک سرویس برای specialName
+  // انتخاب یک سرویس رندوم
   const randomIndex = Math.floor(Math.random() * lines.length);
 
-  // تغییر اسم سرویس‌ها
+  // تغییر نام سرویس‌ها
   lines = lines.map((line, index) => {
-    return line.replace(/(#%[0-9A-Fa-f]+%[0-9A-Fa-f]+)([^#\n]*)/, (_, emoji) => {
-      if (index === randomIndex) {
-        return `${emoji} ${specialName}`;
-      }
-      return `${emoji} ${fancyName}`;
-    });
+    // حذف هر چیزی بعد از # و جایگزینی با نام جدید
+    if (index === randomIndex) {
+      return line.replace(/#.*/, `#${specialName}`);
+    } else {
+      return line.replace(/#.*/, `#${fancyName}`);
+    }
   });
 
   return lines.join("\n");
